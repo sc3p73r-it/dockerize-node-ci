@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+    stage('parallel_scan') {
+        parallel {
+        stage('ImageScan') {
+            steps {
+                sh 'sudo trivy image thihathura/node'
+            }
+        }
+
+        stage('GitScan') {
+            steps {
+                sh 'sudo trivy repo https://github.com/ytechnologies2019/nodejs-dockerize-ci.git'
+                    }
+                }
+            }
+        }
+        stage('deploy') {
+            steps {
+                build 'deployment'
+            }
+        }
+    }
+}

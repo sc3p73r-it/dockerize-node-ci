@@ -1,0 +1,26 @@
+pipeline {
+    agent {
+        docker {
+            image 'docker:dind'
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                 sh 'docker ps -aq'
+            }
+        }
+
+        // stage('Run') {
+        //     steps {
+        //         sh 'docker run -dp 3000:3000 --name node node'
+        //     }
+        // }
+        // stage('ImageBuild') {
+        //     steps {
+        //         sh 'docker commit -m "node" -a "node" node thihathura/node'
+        //         sh 'hostname'
+        //     }
+        // }
+    }
+}

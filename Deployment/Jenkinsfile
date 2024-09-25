@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Clear Duplicate') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'DEPLOY_USER', keyFileVariable: 'DEPLOY_USER')]) {
+                    script {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no -i $DEPLOY_USER ubuntu@18.116.42.102 "sudo docker stop node && sudo docker rm node"
+                        ssh  -o StrictHostKeyChecking=no -i $DEPLOY_USER ubuntu@18.116.42.102 "sudo docker rmi thihathura/node"
+                        '''
+                    }
+                }
+            }
+        }
+        stage('IMAGE_BUILD') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'DEPLOY_USER', keyFileVariable: 'DEPLOY_USER')]) {
+                    script {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no -i $DEPLOY_USER ubuntu@18.116.42.102 "sudo docker pull thihathura/node"
+                        '''
+                    }
+                }
+            }
+        }
+        stage('CONTAINER_CREATE') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'DEPLOY_USER', keyFileVariable: 'DEPLOY_USER')]) {
+                    script {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no -i $DEPLOY_USER ubuntu@18.116.42.102 "sudo docker run -dp 3000:3000 --name node thihathura/node"
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
